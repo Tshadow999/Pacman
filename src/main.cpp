@@ -5,12 +5,9 @@
 #include <SDL2/SDL.h>
 #include <vector>
 
-static int counter{ 0 };
 Uint32 gameUpdate(Uint32 interval, void* /*param*/)
 {
     // Do game loop update here
-    if(++counter % 10 == 0) GameManager::Get().PrintBoard();
-
     return interval;
 }
 
@@ -24,7 +21,9 @@ int main(int /*argc*/, char** /*argv*/)
     // Start timer for game update, call this function every 100 ms.
     SDL_TimerID timer_id = SDL_AddTimer(100, gameUpdate, static_cast<void*>(nullptr));
 
+    // Initialize pacman
     PacmanStruct pacman{13, 11, UP};
+    manager.SetPacman(&pacman);
 
     bool quit = false;
 
@@ -57,9 +56,14 @@ int main(int /*argc*/, char** /*argv*/)
                 case SDLK_ESCAPE:
                     quit = true;
                     break;
+                case SDLK_r:
+                    // Reset the game
+                    break;
                 }
             }
         }
+
+        if (manager.IsLevelCompleted()) continue;
 
         Point2D newPos = pacman.GetNextPosition();
 

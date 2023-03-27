@@ -14,10 +14,9 @@ struct PacmanStruct : GameObjectStruct {
         auto& manager = GameManager::Get();
 
         auto currentPos = Point2D(x, y);
-        // Eat the dot
+        // Eat the dot if there is one at the current position
         if (manager.GetValueAt(currentPos) == Dot) {
             manager.SetValueAt(currentPos, 0);
-            manager.AddScore(10);
         }
     }
 };

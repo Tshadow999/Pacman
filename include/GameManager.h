@@ -5,6 +5,8 @@
 #include "Point2D.h"
 #include "Collidable.h"
 
+struct PacmanStruct;
+
 class GameManager
 {
 public:
@@ -40,30 +42,50 @@ public:
 #pragma endregion
 
 #pragma region Score
-    void AddScore(int amountToAdd);
     int GetScore();
+    bool IsLevelCompleted();
 #pragma endregion
 
-    // PacmanStruct GetPacman();
+#pragma region Pacman
+     PacmanStruct* GetPacman();
+     void SetPacman(PacmanStruct* pacman);
+#pragma endregion
 
 private:
     const static short BOARD_COLUMNS = 28;
     const static short BOARD_ROWS = 27; 
 
+#pragma region ScoreValues
+    const int SCORE_DOT = 10;
+    const int SCORE_ENERGIZER = 50;
+
+    // All Fruit have different score values, 
+    // For simplicity just add the same value for each of the fruits (orange == 500)
+    const int SCORE_FRUIT = 500;
+
+    const int SCORE_GHOST = 200; // Eat multiple ghosts and recieve double for each one you eat.
+#pragma endregion
+
     // Starting position
-    // PacmanStruct _pacman{ 13, 11, UP };
+
+    PacmanStruct* _pacman{ nullptr };
 
     short _lives{ 3 };
     int _score{ 0 };
-    int _dotCount{0};
+    int _dotCount{268};
+    int _ghostsEaten{ 0 };
     bool _levelCompleted{ false };
 
     std::vector<std::vector<short>> _gameBoard = { {
-        #include "board.def"
+        #include "board.def" 
     } };
 
     GameManager() {};
 
     bool IsValidPosition(Point2D position);
     bool IsValidPosition(int x, int y);
+
+    // Only the game manager should be able to change the score
+    void AddScore(int amountToAdd);
+
 };

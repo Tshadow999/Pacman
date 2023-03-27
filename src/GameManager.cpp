@@ -46,19 +46,18 @@ void GameManager::SetValueAt(Point2D position, short value) {
 
     // Dot is going to be eaten.
     if (_gameBoard[position.y][position.x] == Dot && value == 0) {
-
+        _dotCount--;
+        AddScore(SCORE_DOT);
     }
 
     // Reverse x and y, since that is how the position and array indexing work
     _gameBoard[position.y][position.x] = value;
 
-
-
-    // Possible improvement: have an int dotCount.
-    // derement the dotCount if the position is a dot and the value is zero
-    // Then check if the dotCount is zero to check if the level is completed.
-
-    _levelCompleted = true;
+    // All dots are eaten, level is now completed
+    if (_dotCount == 0) {
+        _levelCompleted = true;
+        std::cout << "Well done!\nYou have completed this level of pacman.\n";
+    }
 }
 
 /// <summary>
@@ -70,11 +69,11 @@ bool GameManager::CanMove(Point2D& position) {
 
     // Check the portal. (0, 13), (27, 13)
     if (position.x < 0 && position.y == 13) {
-        position.x = BOARD_ROWS - 1;
+        position.x = BOARD_ROWS;
         return true;
     }
     else if (position.x > BOARD_ROWS && position.y == 13) {
-        position.x = 1;
+        position.x = 0;
         return true;
     }
 
@@ -126,9 +125,34 @@ bool GameManager::IsValidPosition(int x, int y) {
 /// <returns>The score pacman currently has</returns>
 int GameManager::GetScore() { return _score; }
 
+/// <returns>true if the all dots have been eaten</returns>
+bool GameManager::IsLevelCompleted() { return _levelCompleted; }
+
+
 /// <summary>
 /// Adds an amount to the score variable
 /// </summary>
 /// <param name="amountToAdd">should be positive</param>
 void GameManager::AddScore(int amountToAdd) { _score += amountToAdd; }
 
+/// <summary>
+/// Use SetPacman before calling this method
+/// </summary>
+/// <returns>a pointer to the pacman object</returns>
+PacmanStruct* GameManager::GetPacman()
+{
+    // We have not yet recieved a pacman
+    if (_pacman == nullptr) {
+        std::cout << "Pacman is still null at this point!\n";
+        std::cout << "Please initialize pacman with the SetPacman method\n\n";
+        return nullptr;
+    }
+    return _pacman;
+}
+/// <summary>
+/// Sets the pacman instance so others can get access to it.
+/// </summary>
+/// <param name="pacman">the pacman</param>
+void GameManager::SetPacman(PacmanStruct* pacman)
+{
+}
