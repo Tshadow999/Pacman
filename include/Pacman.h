@@ -18,5 +18,9 @@ struct PacmanStruct : GameObjectStruct {
         if (manager.GetValueAt(currentPos) == Dot) {
             manager.SetValueAt(currentPos, 0);
         }
+        // Eat the Energizer
+        if (manager.GetValueAt(currentPos) == Energizer) {
+            manager.SetValueAt(currentPos, 0);
+        }
     }
 };

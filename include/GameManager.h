@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Point2D.h"
 #include "Collidable.h"
+#include "GameObjectStruct.h"
 
 struct PacmanStruct;
 
@@ -22,7 +23,7 @@ public:
     GameManager& operator = (const GameManager&) = delete;
 
 #pragma region Board
-    std::vector<std::vector<short>>& GetBoard();
+    std::vector<std::vector<short>> GetBoard();
 
     void PrintBoard();
 
@@ -33,8 +34,9 @@ public:
 
 #pragma region Movement
     bool CanMove(Point2D& position);
-
 #pragma endregion
+
+    void Reset();
 
 #pragma region Lives
     void ReduceLives();
@@ -49,7 +51,12 @@ public:
 #pragma region Pacman
      PacmanStruct* GetPacman();
      void SetPacman(PacmanStruct* pacman);
+     void TryEatPacman(Point2D positionToCheck);
 #pragma endregion
+
+     void AddGhost(GameObjectStruct ghost) {
+         _ghosts.push_back(ghost);
+     }
 
 private:
     const static short BOARD_COLUMNS = 28;
@@ -67,8 +74,8 @@ private:
 #pragma endregion
 
     // Starting position
-
     PacmanStruct* _pacman{ nullptr };
+    std::vector<GameObjectStruct> _ghosts;
 
     short _lives{ 3 };
     int _score{ 0 };

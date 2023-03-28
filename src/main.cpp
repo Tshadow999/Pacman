@@ -1,9 +1,11 @@
 #include "GameManager.h"
 #include "Pacman.h"
 #include "GameObjectStruct.h"
+#include "Ghost.h"
 #include "UI.h"
 #include <SDL2/SDL.h>
 #include <vector>
+#include <thread>
 
 Uint32 gameUpdate(Uint32 interval, void* /*param*/)
 {
@@ -24,6 +26,17 @@ int main(int /*argc*/, char** /*argv*/)
     // Initialize pacman
     PacmanStruct pacman{13, 11, UP};
     manager.SetPacman(&pacman);
+
+    // Create the ghosts
+    ClydeGhost clyde{ 12,13 };
+    InkyGhost inky{ 13,13 };
+    BlinkyGhost blinky{ 14,13 };
+    PinkyGhost pinky{ 15,13 };
+
+    manager.AddGhost((GameObjectStruct)clyde);
+    manager.AddGhost((GameObjectStruct)inky);
+    manager.AddGhost((GameObjectStruct)blinky);
+    manager.AddGhost((GameObjectStruct)pinky);
 
     bool quit = false;
 
@@ -58,6 +71,7 @@ int main(int /*argc*/, char** /*argv*/)
                     break;
                 case SDLK_r:
                     // Reset the game
+                    manager.Reset();
                     break;
                 }
             }
@@ -65,15 +79,21 @@ int main(int /*argc*/, char** /*argv*/)
 
         if (manager.IsLevelCompleted()) continue;
 
-        Point2D newPos = pacman.GetNextPosition();
+        Point2D pacmanNextPos = pacman.GetNextPosition();
 
-        if (manager.CanMove(newPos)) {
-            pacman.x = newPos.x;
-            pacman.y = newPos.y;
+        if (manager.CanMove(pacmanNextPos)) {
+            pacman.x = pacmanNextPos.x;
+            pacman.y = pacmanNextPos.y;
             pacman.Eat();
 
             ui.SetBoard(manager.GetBoard());
         }
+
+        // move the ghosts
+        inky.Tick();
+        clyde.Tick();
+        pinky.Tick();
+        blinky.Tick();
 
         // Set the score
         ui.setScore(manager.GetScore());
@@ -81,7 +101,7 @@ int main(int /*argc*/, char** /*argv*/)
         // Set the amount of lives
         ui.setLives(manager.GetLives());
 
-        std::vector<GameObjectStruct> objects = { (GameObjectStruct)pacman };
+        std::vector<GameObjectStruct> objects = { pacman, clyde, inky, blinky, pinky };
 
         // Update the sprites
         ui.update(objects);

@@ -273,6 +273,12 @@ void UI::drawBackground(std::vector<std::vector<short>> &map)
                                 TILESIZE };
                 SDL_RenderCopy(renderer, sheet, &clips[DOT][UP], &dst);
             }
+            if (map[i][j] == Energizer) {
+                SDL_Rect dst = { static_cast<int>(j) * TILESIZE,
+                                static_cast<int>(i) * TILESIZE, TILESIZE,
+                                TILESIZE };
+                SDL_RenderCopy(renderer, sheet, &clips[ENERGIZER][UP], &dst);
+            }
         }
     }
 }

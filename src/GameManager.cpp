@@ -1,4 +1,5 @@
 #include "GameManager.h"
+#include "Pacman.h"
 
 /// <summary>
 /// Creates a static instance of the GameManager if it did not exist already.
@@ -84,11 +85,16 @@ bool GameManager::CanMove(Point2D& position) {
     return _gameBoard[position.y][position.x] != 1;
 }
 
+void GameManager::Reset()
+{
+    _pacman->Reset();
+}
+
 /// <summary>
 /// Statically gets the game board so the instance in not required
 /// </summary>
 /// <returns>The game board</returns>
-std::vector<std::vector<short>>& GameManager::GetBoard() { return _gameBoard; }
+std::vector<std::vector<short>> GameManager::GetBoard() { return _gameBoard; }
 
 /// <summary>
 /// Will reduce pacmans live by one. When there are no more lives, the game is over.
@@ -150,9 +156,28 @@ PacmanStruct* GameManager::GetPacman()
     return _pacman;
 }
 /// <summary>
-/// Sets the pacman instance so others can get access to it.
+/// Sets the pacman instance so others can BF access to it.
 /// </summary>
 /// <param name="pacman">the pacman</param>
 void GameManager::SetPacman(PacmanStruct* pacman)
 {
+    _pacman = pacman;
+}
+
+void GameManager::TryEatPacman(Point2D positionToCheck)
+{
+    Point2D pacmanPos(_pacman->x, _pacman->y);
+    if (pacmanPos != positionToCheck) return;
+
+    // Pacman has collided with the ghost
+    ReduceLives();
+
+    // Reset all positions of the ghosts and pacman
+    _pacman->Reset();
+
+    // Reset all ghosts
+    for (auto ghost : _ghosts) {
+        ghost.Reset();
+    }
+    
 }

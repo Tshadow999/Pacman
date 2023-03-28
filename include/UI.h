@@ -43,7 +43,7 @@ class UI
     /// Destructor fully de-initializes the UI, including closing the main window.
     ~UI();
 
-    void SetBoard(std::vector<std::vector<short>>& _map) {
+    void SetBoard(std::vector<std::vector<short>> _map) {
         map = _map;
     }
 

@@ -33,18 +33,29 @@ enum Type {
 };
 
 /// An enum to denote the direction of an item on screen.
-enum Direction { UP, DOWN, LEFT, RIGHT };
+enum Direction { UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3 };
 
 /// This represents an item that is drawn onto the screen.
 struct GameObjectStruct {
-    /// x-position of the item.
+
+    GameObjectStruct(int x, int y, Type type, Direction dir) : x{ x }, y{ y }, type{ type }, dir{ dir } {
+        _initialX = x;
+        _initialY = y;
+        _initialDir = dir;
+        _initialType = type;
+    };
+
     int x;
-    /// y-position of the item.
     int y;
-    /// The appearance of the item (sprite set).
+
     Type type;
-    /// The direction of the item (sprite selection).
+    
     Direction dir;
+
+    Point2D UpDir() { return Point2D(x, y - 1); }
+    Point2D DownDir() { return Point2D(x, y + 1); }
+    Point2D LeftDir() { return Point2D(x - 1, y ); }
+    Point2D RightDir() { return Point2D(x + 1, y); }
 
     /// <returns>the next position using the current direction</returns>
     Point2D GetNextPosition()
@@ -52,16 +63,31 @@ struct GameObjectStruct {
         // Since top left is (0,0) up: y - 1; down: y + 1; left: x - 1; right: x + 1;
         switch (dir) {
         case UP:
-            return Point2D(x, y - 1);
+            return UpDir();
         case DOWN:
-            return Point2D(x, y + 1);
+            return DownDir();
         case LEFT:
-            return Point2D(x - 1, y);
+            return LeftDir();
         case RIGHT:
-            return Point2D(x + 1, y);
+            return RightDir();
         default:
             // Should never get here
             return Point2D(0, 0);
         }
     }
+    /// <summary>
+    /// Resets the gameObjects to the initial position
+    /// </summary>
+    void Reset() {
+        x = _initialX;
+        y = _initialY;
+        dir = _initialDir;
+        type = _initialType;
+    }
+
+private:
+    int _initialX;
+    int _initialY;
+    Type _initialType;
+    Direction _initialDir;
 };
