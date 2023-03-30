@@ -11,14 +11,14 @@
 
 #include <iostream>
 
-UI::UI(std::vector<std::vector<short>> map)
+UI::UI(std::vector<std::vector<short>>* map)
 {
     // Initialize and load textures.
     this->init();
     this->loadTextures();
 
     // Set the map
-    this->map = std::move(map);
+    this->map = map;
 }
 
 UI::~UI()
@@ -34,21 +34,15 @@ void UI::update(std::vector<GameObjectStruct> objects)
     // Clear the current renderer.
     SDL_RenderClear(renderer);
 
-    // Draw the walls.
-    drawBackground(map);
-
-    // Draw the score.
+    // Update the game
+    drawBackground(*map);
     drawScore();
-
-    // Draw the lives.
     drawLives();
 
     // Loop through all the objects and draw them.
     for (auto &element : objects) {
-        SDL_Rect dst = {element.x * TILESIZE, element.y * TILESIZE, TILESIZE,
-                        TILESIZE};
-        SDL_RenderCopy(renderer, sheet, &clips[element.type][element.dir],
-                       &dst);
+        SDL_Rect dst = {element.x * TILESIZE, element.y * TILESIZE, TILESIZE, TILESIZE};
+        SDL_RenderCopy(renderer, sheet, &clips[element.type][element.dir], &dst);
     }
 
     // Update the screen.
@@ -242,22 +236,9 @@ void UI::loadMaps()
     }
 }
 
-void UI::PrintMap() {
-    std::cout << "\n\nUI MAP\n";
-    for (int i = 0; i < 27; i++) {
-        for (int j = 0; j < 28; j++) {
-           std::cout << map[i][j] << " ";
-           if (map[i][j] < 10) {
-               std::cout << " ";
-           }
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\n\n";
-}
+void UI::PrintMap() {}
 
-void UI::drawBackground(std::vector<std::vector<short>> &map)
-{
+void UI::drawBackground(std::vector<std::vector<short>> &map) {
     // Draw a wall on each position containing a one
     for (size_t i = 0; i < map.size(); i++) {
         for (size_t j = 0; j < map[i].size(); j++) {

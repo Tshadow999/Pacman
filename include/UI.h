@@ -33,7 +33,7 @@ class UI
     /// bitmap on disk.
     ///
     /// \param map the map of the board
-    UI(std::vector<std::vector<short>> map);
+    UI(std::vector<std::vector<short>>* map);
 
     // UI objects should not be copied or moved.
     UI(const UI&) = delete;
@@ -42,10 +42,6 @@ class UI
 
     /// Destructor fully de-initializes the UI, including closing the main window.
     ~UI();
-
-    void SetBoard(std::vector<std::vector<short>> _map) {
-        map = _map;
-    }
 
     /// Setter for the score.
     ///
@@ -109,7 +105,7 @@ class UI
     SDL_Texture *sheet;
 
     /// 2d array containing the map, a 1 is a wall.
-    std::vector<std::vector<short>> map;
+    std::vector<std::vector<short>>* map;
 
     /// Map containing all the game objects.
     ///

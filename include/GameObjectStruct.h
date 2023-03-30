@@ -84,10 +84,20 @@ struct GameObjectStruct {
         dir = _initialDir;
         type = _initialType;
     }
+    /// <summary>
+    /// Toggles the movement of the ghosts
+    /// </summary>
+    /// <param name="toggle">: true for movement, false for no movement</param>
+    void ToggleMovement(bool toggle) {
+        _canMove = toggle;
+    }
 
 private:
     int _initialX;
     int _initialY;
     Type _initialType;
     Direction _initialDir;
+
+protected:
+    bool _canMove{ false };
 };

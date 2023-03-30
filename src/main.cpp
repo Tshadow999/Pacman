@@ -17,7 +17,8 @@ int main(int /*argc*/, char** /*argv*/)
 {
     GameManager& manager = GameManager::Get();
 
-    // Create a new ui object
+    // Give the UI a location in memory rather than the board itself,
+    // So it updates automatically
     UI ui(manager.GetBoard());
 
     // Start timer for game update, call this function every 100 ms.
@@ -33,10 +34,10 @@ int main(int /*argc*/, char** /*argv*/)
     BlinkyGhost blinky{ 14,13 };
     PinkyGhost pinky{ 15,13 };
 
-    manager.AddGhost((GameObjectStruct)clyde);
-    manager.AddGhost((GameObjectStruct)inky);
-    manager.AddGhost((GameObjectStruct)blinky);
-    manager.AddGhost((GameObjectStruct)pinky);
+    manager.AddGhost(&clyde);
+    manager.AddGhost(&inky);
+    manager.AddGhost(&blinky);
+    manager.AddGhost(&pinky);
 
     bool quit = false;
 
@@ -85,8 +86,6 @@ int main(int /*argc*/, char** /*argv*/)
             pacman.x = pacmanNextPos.x;
             pacman.y = pacmanNextPos.y;
             pacman.Eat();
-
-            ui.SetBoard(manager.GetBoard());
         }
 
         // move the ghosts
@@ -94,6 +93,10 @@ int main(int /*argc*/, char** /*argv*/)
         clyde.Tick();
         pinky.Tick();
         blinky.Tick();
+
+        if (manager.GetScore() >= 100) {
+            manager.ToggleGhostMovement(true);
+        }
 
         // Set the score
         ui.setScore(manager.GetScore());

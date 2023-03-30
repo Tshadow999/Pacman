@@ -6,7 +6,10 @@
 #include "Collidable.h"
 #include "GameObjectStruct.h"
 
-struct PacmanStruct;
+
+
+typedef struct PacmanStruct;
+typedef struct GhostStruct;
 
 class GameManager
 {
@@ -23,7 +26,7 @@ public:
     GameManager& operator = (const GameManager&) = delete;
 
 #pragma region Board
-    std::vector<std::vector<short>> GetBoard();
+    std::vector<std::vector<short>>* GetBoard();
 
     void PrintBoard();
 
@@ -54,9 +57,15 @@ public:
      void TryEatPacman(Point2D positionToCheck);
 #pragma endregion
 
-     void AddGhost(GameObjectStruct ghost) {
+#pragma region Ghosts
+
+     // Make the Ghosts add themselves
+     void AddGhost(GameObjectStruct* ghost) {
          _ghosts.push_back(ghost);
      }
+
+     void ToggleGhostMovement(bool toggle);
+#pragma endregion
 
 private:
     const static short BOARD_COLUMNS = 28;
@@ -75,11 +84,11 @@ private:
 
     // Starting position
     PacmanStruct* _pacman{ nullptr };
-    std::vector<GameObjectStruct> _ghosts;
+    std::vector<GameObjectStruct*> _ghosts;
 
     short _lives{ 3 };
     int _score{ 0 };
-    int _dotCount{268};
+    int _dotCount{264};
     int _ghostsEaten{ 0 };
     bool _levelCompleted{ false };
 
@@ -94,5 +103,4 @@ private:
 
     // Only the game manager should be able to change the score
     void AddScore(int amountToAdd);
-
 };

@@ -1,5 +1,6 @@
 #include "GameManager.h"
 #include "Pacman.h"
+#include "Ghost.h"
 
 /// <summary>
 /// Creates a static instance of the GameManager if it did not exist already.
@@ -51,6 +52,11 @@ void GameManager::SetValueAt(Point2D position, short value) {
         AddScore(SCORE_DOT);
     }
 
+    // Energizer Eaten
+    if (_gameBoard[position.y][position.x] == Energizer && value == 0) {
+        AddScore(SCORE_ENERGIZER);
+    }
+
     // Reverse x and y, since that is how the position and array indexing work
     _gameBoard[position.y][position.x] = value;
 
@@ -88,13 +94,17 @@ bool GameManager::CanMove(Point2D& position) {
 void GameManager::Reset()
 {
     _pacman->Reset();
+
+    for (auto ghostObject : _ghosts) {
+        ghostObject->Reset();
+    }
 }
 
 /// <summary>
 /// Statically gets the game board so the instance in not required
 /// </summary>
 /// <returns>The game board</returns>
-std::vector<std::vector<short>> GameManager::GetBoard() { return _gameBoard; }
+std::vector<std::vector<short>>* GameManager::GetBoard() { return &_gameBoard; }
 
 /// <summary>
 /// Will reduce pacmans live by one. When there are no more lives, the game is over.
@@ -114,18 +124,11 @@ short GameManager::GetLives() { return _lives; }
 /// <returns>true if valid, false if not valid</returns>
 bool GameManager::IsValidPosition(Point2D position) { return IsValidPosition(position.x, position.y); }
 
-
 /// <param name="x">part of the point</param>
 /// <param name="y">part of the point</param>
 /// <returns>true if valid, false if not valid</returns>
 bool GameManager::IsValidPosition(int x, int y) {
-    // x and or y are too small
-    if (x < 0 || y < 0) return false;
-
-    // x and or y are too big
-    if (x >= BOARD_COLUMNS || y >= BOARD_ROWS) return false;
-
-    return true;
+    return !(x < 0 || y < 0 || x >= BOARD_COLUMNS || y >= BOARD_ROWS);
 }
 
 /// <returns>The score pacman currently has</returns>
@@ -145,8 +148,7 @@ void GameManager::AddScore(int amountToAdd) { _score += amountToAdd; }
 /// Use SetPacman before calling this method
 /// </summary>
 /// <returns>a pointer to the pacman object</returns>
-PacmanStruct* GameManager::GetPacman()
-{
+PacmanStruct* GameManager::GetPacman() {
     // We have not yet recieved a pacman
     if (_pacman == nullptr) {
         std::cout << "Pacman is still null at this point!\n";
@@ -159,14 +161,13 @@ PacmanStruct* GameManager::GetPacman()
 /// Sets the pacman instance so others can BF access to it.
 /// </summary>
 /// <param name="pacman">the pacman</param>
-void GameManager::SetPacman(PacmanStruct* pacman)
-{
+void GameManager::SetPacman(PacmanStruct* pacman) {
     _pacman = pacman;
 }
 
-void GameManager::TryEatPacman(Point2D positionToCheck)
-{
+void GameManager::TryEatPacman(Point2D positionToCheck) {
     Point2D pacmanPos(_pacman->x, _pacman->y);
+
     if (pacmanPos != positionToCheck) return;
 
     // Pacman has collided with the ghost
@@ -177,7 +178,17 @@ void GameManager::TryEatPacman(Point2D positionToCheck)
 
     // Reset all ghosts
     for (auto ghost : _ghosts) {
-        ghost.Reset();
+        ghost->Reset();
     }
     
+}
+
+/// <summary>
+/// Toggles the movement of the ghosts
+/// </summary>
+/// <param name="toggle">true for movement, false for no movement</param>
+void GameManager::ToggleGhostMovement(bool toggle) {
+    for (auto ghost : _ghosts) {
+        ghost->ToggleMovement(toggle);
+    }
 }
