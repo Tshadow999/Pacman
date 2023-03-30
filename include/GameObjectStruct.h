@@ -55,7 +55,7 @@ struct GameObjectStruct {
     Point2D UpDir() { return Point2D(x, y - 1); }
     Point2D DownDir() { return Point2D(x, y + 1); }
     Point2D LeftDir() { return Point2D(x - 1, y ); }
-    Point2D RightDir() { return Point2D(x + 1, y); }
+    Point2D RightDir() { return Point2D(x + 1, y); } 
 
     /// <returns>the next position using the current direction</returns>
     Point2D GetNextPosition()
@@ -75,6 +75,7 @@ struct GameObjectStruct {
             return Point2D(0, 0);
         }
     }
+
     /// <summary>
     /// Resets the gameObjects to the initial position
     /// </summary>
@@ -83,21 +84,13 @@ struct GameObjectStruct {
         y = _initialY;
         dir = _initialDir;
         type = _initialType;
+        _canMove = false;
     }
-    /// <summary>
-    /// Toggles the movement of the ghosts
-    /// </summary>
-    /// <param name="toggle">: true for movement, false for no movement</param>
-    void ToggleMovement(bool toggle) {
-        _canMove = toggle;
-    }
+protected: 
+    bool  _canMove{ false };
 
-private:
     int _initialX;
     int _initialY;
     Type _initialType;
     Direction _initialDir;
-
-protected:
-    bool _canMove{ false };
 };

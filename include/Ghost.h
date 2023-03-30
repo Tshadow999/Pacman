@@ -6,7 +6,6 @@
 
 #include "GameObjectStruct.h"
 #include "GameManager.h"
-#include "Point2D.h"
 
 struct GhostStruct : GameObjectStruct {
 
@@ -17,12 +16,13 @@ struct GhostStruct : GameObjectStruct {
 		std::srand(time(0)); // Initialize with a random seed
 	};
 
-
 	/// <summary>
 	/// Make the ghost scared for a certain amount of ticks
 	/// </summary>
 	void TurnScared() {
 		if (_isScared) return;
+
+		type = SCARED;
 
 		_isScared = true;
 		_scaredCounter = 0;
@@ -32,25 +32,43 @@ struct GhostStruct : GameObjectStruct {
 	/// This method should be called in every update frame.
 	/// </summary>
 	void Tick() {
+		// Make ghosts move slower.
 		HandleScaredState();
-		if (_canMove) {
+
+		_readyToMove = !_readyToMove;
+
+		if (_canMove && _readyToMove) {
 			Move();
 		}
+		else {
+			if (_waitingCounter++ >= WAIT_TO_MOVE_TICKS) {
+				_canMove = true;
+				_waitingCounter = 0;
+			}
+		}
+
 		Eat();
 	}
 
 protected:
-
 	// This handles for how long a ghost is scared
 	short _scaredCounter{ 0 };
-	const short MAX_SCARED_TICKS = 30;
+	const short MAX_SCARED_TICKS = 75;
 	bool _isScared{ false };
 
+	// How many ticks before the ghosts start moving after reset / initially
+	short _waitingCounter{ 0 };
+	const short WAIT_TO_MOVE_TICKS = 45;
+	bool _readyToMove{ false };
 
 	const int RANDOM_MOVE_CHANCE{ 15 }; // 15 % chance to move randomly
 
 	void Eat() {
+		// Do not eat when scared
+		if (_isScared) return;
+
 		Point2D currentPosition(x, y);
+
 
 		GameManager::Get().TryEatPacman(currentPosition);
 	}
@@ -58,10 +76,11 @@ protected:
 	void HandleScaredState() {
 		if (!_isScared) return;
 		_scaredCounter++;
-		type = SCARED;
 		// Ghost is no longer scared
 		if (_scaredCounter >= MAX_SCARED_TICKS) {
 			_isScared = false;
+			type = _initialType;
+			GameManager::Get().GetPacman()->ToggleGhostEating(false);
 		}
 	}
 

@@ -1,12 +1,14 @@
 #pragma once
 
+// These two are for random.
+#include <cstdlib>
+#include <ctime>
+
 #include <vector>
 #include <iostream>
+
 #include "Point2D.h"
 #include "Collidable.h"
-#include "GameObjectStruct.h"
-
-
 
 typedef struct PacmanStruct;
 typedef struct GhostStruct;
@@ -32,6 +34,7 @@ public:
 
     short GetValueAt(Point2D position);
     void SetValueAt(Point2D position, short value);
+    void SpawnFruit();
 
 #pragma endregion
 
@@ -59,12 +62,12 @@ public:
 
 #pragma region Ghosts
 
-     // Make the Ghosts add themselves
-     void AddGhost(GameObjectStruct* ghost) {
+     void AddGhost(GhostStruct* ghost) {
          _ghosts.push_back(ghost);
      }
 
-     void ToggleGhostMovement(bool toggle);
+     void TryEatGhost(Point2D pacmanPos);
+
 #pragma endregion
 
 private:
@@ -79,12 +82,25 @@ private:
     // For simplicity just add the same value for each of the fruits (orange == 500)
     const int SCORE_FRUIT = 500;
 
-    const int SCORE_GHOST = 200; // Eat multiple ghosts and recieve double for each one you eat.
+    // Spawn 3 fruits over the game
+    int _fruitFirstSpawnScore {  750 };
+    int _fruitSecondSpawnScore{ 3500 };
+    int _fruitThirdSpawnScore { 7500 };
+
+    // To make fruit spawn just once.
+    bool _fruitFirstHasSpawned{ false };
+    bool _fruitSecondHasSpawned{ false };
+    bool _fruitThirdHasSpawned{ false };
+
+    // Eat multiple ghosts and recieve double for each one you eat.
+    const int SCORE_GHOST = 200; 
+    int _scoreGhostMultiplier = 1;
+
 #pragma endregion
 
     // Starting position
     PacmanStruct* _pacman{ nullptr };
-    std::vector<GameObjectStruct*> _ghosts;
+    std::vector<GhostStruct*> _ghosts;
 
     short _lives{ 3 };
     int _score{ 0 };
@@ -96,7 +112,10 @@ private:
         #include "board.def" 
     } };
 
-    GameManager() {};
+    GameManager() {
+        // Get random seed
+        std::srand(time(0));
+    };
 
     bool IsValidPosition(Point2D position);
     bool IsValidPosition(int x, int y);

@@ -52,9 +52,22 @@ void GameManager::SetValueAt(Point2D position, short value) {
         AddScore(SCORE_DOT);
     }
 
+    // Fruit is going to be eaten.
+    if (_gameBoard[position.y][position.x] == Fruit && value == 0) {
+        AddScore(SCORE_FRUIT);
+    }
+
     // Energizer Eaten
     if (_gameBoard[position.y][position.x] == Energizer && value == 0) {
         AddScore(SCORE_ENERGIZER);
+
+        // Make the ghosts scared
+        for (auto ghost : _ghosts) {
+            ghost->TurnScared();
+        }
+
+        // Let pacman eat the ghosts
+        _pacman->ToggleGhostEating(true);
     }
 
     // Reverse x and y, since that is how the position and array indexing work
@@ -64,6 +77,39 @@ void GameManager::SetValueAt(Point2D position, short value) {
     if (_dotCount == 0) {
         _levelCompleted = true;
         std::cout << "Well done!\nYou have completed this level of pacman.\n";
+    }
+}
+/// <summary>
+/// Spawns a fruit on a random location in the map
+/// </summary>
+void GameManager::SpawnFruit()
+{
+    // Spawn a fruit when a certain score has been reached
+    if (_score > _fruitFirstSpawnScore && !_fruitFirstHasSpawned) {
+        _fruitFirstHasSpawned = true;
+    }
+    else if (_score > _fruitSecondSpawnScore && !_fruitSecondHasSpawned) {
+        _fruitSecondHasSpawned = true;
+    }
+    else if (_score > _fruitThirdSpawnScore && !_fruitThirdHasSpawned) {
+        _fruitThirdHasSpawned = true;
+    }
+    else {
+        return;
+    }
+
+    bool foundFruit = false;
+
+    while (!foundFruit) {
+        short randomX = rand() % BOARD_COLUMNS;
+        short randomY = rand() % BOARD_ROWS;
+
+        if (_gameBoard[randomY][randomX] == 0) {
+            foundFruit = true;
+
+            printf("[%i, %i]", randomX, randomY);
+            _gameBoard[randomY][randomX] = Fruit;
+        }
     }
 }
 
@@ -113,7 +159,7 @@ void GameManager::ReduceLives() {
     // Reduces amount of lives
     if (--_lives <= 0) {
         // Game over, just quit?
-        //TODO
+        _levelCompleted = true;
     }
 }
 
@@ -142,7 +188,11 @@ bool GameManager::IsLevelCompleted() { return _levelCompleted; }
 /// Adds an amount to the score variable
 /// </summary>
 /// <param name="amountToAdd">should be positive</param>
-void GameManager::AddScore(int amountToAdd) { _score += amountToAdd; }
+void GameManager::AddScore(int amountToAdd) {
+    _score += amountToAdd;
+
+    SpawnFruit();
+}
 
 /// <summary>
 /// Use SetPacman before calling this method
@@ -180,15 +230,19 @@ void GameManager::TryEatPacman(Point2D positionToCheck) {
     for (auto ghost : _ghosts) {
         ghost->Reset();
     }
-    
 }
-
 /// <summary>
-/// Toggles the movement of the ghosts
+/// This will allow pacman to eat the ghosts
 /// </summary>
-/// <param name="toggle">true for movement, false for no movement</param>
-void GameManager::ToggleGhostMovement(bool toggle) {
+void GameManager::TryEatGhost(Point2D pacmanPos) {
     for (auto ghost : _ghosts) {
-        ghost->ToggleMovement(toggle);
+        Point2D ghostPos(ghost->x, ghost->y);
+        // Eat all ghosts that are on the same position as pacman,
+        // Might be more than one, so we cannot break out early
+        if (ghostPos == pacmanPos) {
+            ghost->Reset();
+            AddScore(SCORE_GHOST * _scoreGhostMultiplier);
+            _scoreGhostMultiplier++;
+        }
     }
 }

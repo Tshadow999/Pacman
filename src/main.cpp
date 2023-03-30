@@ -1,8 +1,8 @@
 #include "GameManager.h"
 #include "Pacman.h"
-#include "GameObjectStruct.h"
 #include "Ghost.h"
 #include "UI.h"
+
 #include <SDL2/SDL.h>
 #include <vector>
 #include <thread>
@@ -33,6 +33,7 @@ int main(int /*argc*/, char** /*argv*/)
     InkyGhost inky{ 13,13 };
     BlinkyGhost blinky{ 14,13 };
     PinkyGhost pinky{ 15,13 };
+
 
     manager.AddGhost(&clyde);
     manager.AddGhost(&inky);
@@ -71,14 +72,16 @@ int main(int /*argc*/, char** /*argv*/)
                     quit = true;
                     break;
                 case SDLK_r:
-                    // Reset the game
-                    manager.Reset();
+                    // For quick testing
+
                     break;
                 }
             }
         }
 
-        if (manager.IsLevelCompleted()) continue;
+        if (manager.IsLevelCompleted()) {
+            quit = true;
+        }
 
         Point2D pacmanNextPos = pacman.GetNextPosition();
 
@@ -93,10 +96,6 @@ int main(int /*argc*/, char** /*argv*/)
         clyde.Tick();
         pinky.Tick();
         blinky.Tick();
-
-        if (manager.GetScore() >= 100) {
-            manager.ToggleGhostMovement(true);
-        }
 
         // Set the score
         ui.setScore(manager.GetScore());
