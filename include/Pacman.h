@@ -44,5 +44,4 @@ struct PacmanStruct : GameObjectStruct {
     }
 protected: 
     bool _canEatGhosts{ false };
-
 };

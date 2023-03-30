@@ -105,7 +105,6 @@ private:
     short _lives{ 3 };
     int _score{ 0 };
     int _dotCount{264};
-    int _ghostsEaten{ 0 };
     bool _levelCompleted{ false };
 
     std::vector<std::vector<short>> _gameBoard = { {

@@ -73,7 +73,6 @@ int main(int /*argc*/, char** /*argv*/)
                     break;
                 case SDLK_r:
                     // For quick testing
-
                     break;
                 }
             }

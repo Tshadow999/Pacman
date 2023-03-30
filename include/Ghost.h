@@ -98,7 +98,7 @@ protected:
 		int doRandomMovement = rand() % 100; // Make choice out of 100 options (0 to 99)
 		int randomDir = rand() % 4; // 4 directions
 
-		std::vector<Point2D> possilePaths = { UpDir(), DownDir(), LeftDir(),  RightDir() };
+		std::vector<Point2D> possilePaths = { UpDir(), LeftDir(), DownDir(), RightDir() };
 
 		// Keep moving in the current direction
 		if (manager.CanMove(nextPosition) && (doRandomMovement >= RANDOM_MOVE_CHANCE)) {
@@ -109,7 +109,7 @@ protected:
 
 		if (manager.CanMove(possilePaths[randomDir])) {
 			// Check if we can move in the random direction
-			dir = (Direction)randomDir;
+			dir = (randomDir == 0 || randomDir == 3) ?(Direction)randomDir : randomDir == 1 ? LEFT : DOWN;
 
 			x = possilePaths[randomDir].x;
 			y = possilePaths[randomDir].y;
@@ -120,7 +120,7 @@ protected:
 		// We either cannot move in the current direction or we cannot move in the random direction
 		for (int i = 0; i < 4; i++) {
 			if (manager.CanMove(possilePaths[i])) {
-				dir = (Direction)i;
+				dir = (i == 0 || i == 3) ? (Direction)i : i == 1 ? LEFT : DOWN;
 
 				x = possilePaths[i].x;
 				y = possilePaths[i].y;
